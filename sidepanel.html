@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Construe AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <span class="logo-text">Construe</span>
+    </div>
+    <button class="settings-btn" id="settingsToggle" title="Settings">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M21 12h-2M5 12H3M12 21v-2M12 5V3"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Settings Panel -->
+  <div class="settings-panel hidden" id="settingsPanel">
+    <div class="settings-inner">
+      <h3 class="settings-title">Configuration</h3>
+      <div class="field-group">
+        <label class="field-label">Anthropic API Key</label>
+        <div class="api-key-wrapper">
+          <input type="password" id="apiKeyInput" class="field-input" placeholder="sk-ant-..." />
+          <button class="toggle-visibility" id="toggleApiKey" title="Show/Hide">
+            <svg id="eyeIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Response Language</label>
+        <select id="langSelect" class="field-select">
+          <option value="English">English</option>
+          <option value="Indonesian">Indonesian</option>
+          <option value="auto">Auto-detect</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Analysis Mode</label>
+        <select id="modeSelect" class="field-select">
+          <option value="explain">Explain & Define</option>
+          <option value="summarize">Summarize</option>
+          <option value="translate">Translate</option>
+          <option value="fact-check">Fact Check</option>
+          <option value="expand">Expand & Elaborate</option>
+        </select>
+      </div>
+      <button class="save-btn" id="saveSettings">Save Settings</button>
+      <p class="settings-note">API key stored locally in your browser only.</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main" id="mainContent">
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+          <polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+        </svg>
+      </div>
+      <p class="empty-title">Highlight text to begin</p>
+      <p class="empty-sub">Select any text on the page, then click the <strong>Ask Construe</strong> button that appears.</p>
+    </div>
+
+    <!-- Results area -->
+    <div class="results hidden" id="resultsArea">
+
+      <!-- Keyword chip -->
+      <div class="keyword-section">
+        <div class="keyword-label">Selected text</div>
+        <div class="keyword-chip" id="keywordChip"></div>
+      </div>
+
+      <!-- Analyze button -->
+      <button class="analyze-btn" id="analyzeBtn">
+        <span id="analyzeBtnText">Analyze</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+
+      <!-- Response card -->
+      <div class="response-card hidden" id="responseCard">
+        <div class="response-header">
+          <div class="response-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Claude
+          </div>
+          <button class="copy-btn" id="copyBtn" title="Copy response">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy
+          </button>
+        </div>
+        <div class="response-body" id="responseBody"></div>
+      </div>
+
+      <!-- Loading state -->
+      <div class="loading hidden" id="loadingState">
+        <div class="loading-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <p class="loading-text">Claude is thinking…</p>
+      </div>
+
+      <!-- Error state -->
+      <div class="error-card hidden" id="errorCard">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="errorMsg">Something went wrong.</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- History -->
+  <div class="history-section" id="historySection">
+    <div class="history-header">
+      <span class="history-title">Recent</span>
+      <button class="clear-history-btn" id="clearHistory">Clear</button>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
